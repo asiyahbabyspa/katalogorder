@@ -179,4 +179,5 @@ function ana(){const a=agg(H),p=agg(PH),nd=Math.round((new Date(FT)-new Date(FF)
  <button class="bt" onclick="csv()">⬇️ Unduh CSV</button>`}
 function csv(){const l=['no,waktu,pelanggan,terapis,sumber,kategori,metode,total,tips,status'].concat(H.map(r=>[r.no,r.waktu,'"'+String(r.pelanggan).replace(/"/g,'')+'"',r.terapis,r.sumber,r.kategori,r.metode,r.total,r.tips,r.status].join(',')));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([l.join('\n')],{type:'text/csv'}));a.download=`kasir-${FF}_${FT}.csv`;a.click()}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});start();
-</script></body></html>
+</script><script src="riwayat-plus.js"></script>
+</body></html>
