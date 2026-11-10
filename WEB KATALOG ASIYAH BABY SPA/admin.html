@@ -29,6 +29,15 @@ input,select,textarea{width:100%;min-width:64px;border:1px solid var(--ln);backg
 <b>Asiyah Mom &amp; Baby Care</b><small>Pusat analitik leads, evaluasi EOS, dan pengaturan layanan</small><nav id="nav"></nav></div>
 <main id="m"></main>
 <script>
+// Penghubung ke Apps Script dari Vercel: meniru google.script.run lewat fetch
+var APP_URL="https://script.google.com/macros/s/AKfycbxLi633P0qsM3lI92uB-AdWbEjb3oRbFDxhLr9FMBbGWlJ0Jnu561OCEhCssFXdn3cM/exec";
+var google={script:{run:(function(){var A={adminData:['k'],adminLead:['k','r','status','catatan'],adminSave:['k','n','list']};
+function mk(ok,bad){var o={withSuccessHandler:function(f){return mk(f,bad)},withFailureHandler:function(f){return mk(ok,f)}};
+Object.keys(A).forEach(function(n){o[n]=function(){var a=arguments,b={api:n};A[n].forEach(function(k,i){b[k]=a[i]});
+fetch(APP_URL,{method:"POST",body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(r){if(r.error)throw new Error(r.error);if(ok)ok(r.d)}).catch(function(e){if(bad)bad(e);else alert(e.message)})}});return o}
+return mk()})()}};
+</script>
+<script>
 var K='',D,S={},E=[],tab='dash',R='7',FS='Semua',FQ='',PQ='';
 try{K=sessionStorage.k||''}catch(e){}
 var COLS={Produk:['aktif','kategori','nama','deskripsi','harga','tag','aturan'],Tombol:['aktif','urutan','kode','judul','deskripsi','kategori','badge']};
