@@ -1,2 +1,2 @@
-const C='kasir-v10';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
+const C='kasir-v7';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>clients.claim())));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;e.respondWith(caches.open(C).then(c=>c.match(r).then(m=>{const f=fetch(r).then(x=>{c.put(r,x.clone());return x}).catch(()=>m);return m||f})))});
