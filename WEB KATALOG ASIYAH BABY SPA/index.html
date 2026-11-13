@@ -179,10 +179,13 @@ upd=function(){_u();var n=items().length;if(n&&!seen){seen=true;$("toast").class
 function done(u){$("ok").style.display="block";$("okl").href=u;$("ptx").textContent="Pesanan terkirim ke WhatsApp.";$("pbar").style.width="100%"}
 tiles();panel();upd();
 
+// Kategori mengikuti kolom kategori di sheet Produk; nama dari Setting.
+var DESC={kelas:"Kelas persiapan persalinan dan menyusui",hamil:"Pijat bumil, yoga prenatal, dan pendampingan persalinan",newborn:"Dirawat bidan di rumah Bunda",bapilbayi:"Terapi batuk pilek bayi",bayi:"Pijat, baby spa, dan perawatan harian bayi",anak:"Pijat dan spa anak",bapilanak:"Terapi batuk pilek anak",nifas:"Perawatan ibu pasca melahirkan",laktasi:"Pijat laktasi, konseling, dan pendampingan"},IMK={kelas:"bumil",hamil:"bumil",newborn:"newborn",bapilbayi:"terapi",bapilanak:"terapi",bayi:"pijat",anak:"pijat",nifas:"laktasi",laktasi:"laktasi"},ALIAS={terapi:"bapilbayi",pijat:"bayi"};
+function rebuildCat(K){var n=K.filter(function(x){return ITM.some(function(i){return i[0]==x.k})});if(!n.length)return;CAT=n.map(function(x){return[x.k,x.n,DESC[x.k]||"",IMG[IMK[x.k]]?IMK[x.k]:"logo",""]});IM={};CAT.forEach(function(c){IM[c[0]]=c[3]});var kk="";try{kk=new URLSearchParams(location.search).get("kat")||""}catch(e){}kk=ALIAS[kk]||kk;if(IM[kk])cur=kk;else if(!IM[cur])cur=CAT[0][0]}
 // Ambil layanan, menit, dan slot dari sheet Produk (admin). Bila gagal, daftar bawaan di atas tetap dipakai.
 (function(){try{fetch("https://script.google.com/macros/s/AKfycbxLi633P0qsM3lI92uB-AdWbEjb3oRbFDxhLr9FMBbGWlJ0Jnu561OCEhCssFXdn3cM/exec?action=config").then(function(r){return r.json()}).then(function(c){
  if(c.menit){CONFIG.menit=c.menit;document.querySelectorAll(".mn").forEach(function(e){e.setAttribute("data-m",c.menit)})}
  if(c.slot){CONFIG.slot=c.slot;$("slot").style.display="block";$("slot").textContent=c.slot}
- if(c.produk&&c.produk.length&&!Object.keys(cart).length){ITM=c.produk.map(function(r){return[r.kategori,r.nama,r.deskripsi,+r.harga,r.tag,r.aturan||""]});tiles();panel();upd()}
+ if(c.produk&&c.produk.length&&!Object.keys(cart).length){ITM=c.produk.map(function(r){return[r.kategori,r.nama,r.deskripsi,+r.harga,r.tag,r.aturan||""]});if(c.kat&&c.kat.length)rebuildCat(c.kat);tiles();panel();upd()}
  }).catch(function(){})}catch(e){}})();
 </script></body></html>
