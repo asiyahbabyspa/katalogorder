@@ -32,6 +32,12 @@ nav{box-shadow:0 -4px 18px rgba(20,60,80,.08);border-top:0}nav button.on span{ba
 .ic{border-left:5px solid var(--c);background:var(--cd);border-radius:14px;padding:11px 12px;margin:8px 0}.ic h4{margin:0 0 3px;font-size:14px}.ic p{margin:0 0 8px;font-size:13px;color:var(--mut)}.ab{display:flex;gap:6px;flex-wrap:wrap}
 .sg{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--ln);background:var(--cd);color:var(--ink);padding:9px 10px;font-size:13.5px}.sg span{color:var(--mut);font-size:12px;text-align:right}#sg{border-radius:12px;overflow:hidden;margin:6px 0}#sg>.m{padding:2px 2px}
 #cs{width:100%;margin-top:8px;padding:13px 14px;border-radius:14px;font:inherit;font-weight:700;color:inherit;background:var(--cd);border:1px solid var(--ln)}
+#tourL{position:fixed;inset:0;z-index:90}#tourL.dim{background:rgba(0,0,0,.6)}
+#tsp{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.6);transition:all .25s;pointer-events:none;display:none;border:2px solid #fff}
+#tcd{position:fixed;left:50%;transform:translateX(-50%);width:min(92vw,420px);background:var(--cd);color:var(--ink);border-radius:18px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+#tcd b{font-size:16px}#tcd p{margin:6px 0 10px;color:var(--mut);font-size:14px;line-height:1.45}
+#tcd .td{display:flex;gap:5px;justify-content:center;margin-bottom:10px}#tcd .td i{width:7px;height:7px;border-radius:50%;background:var(--ln)}#tcd .td i.on{background:var(--pr);width:18px;border-radius:4px}
+#tcd .tb{display:flex;justify-content:space-between;align-items:center}#tcd .tb span{display:flex;gap:8px}#tcd button{border:0;border-radius:12px;padding:10px 16px;font-weight:700;background:var(--ln);color:var(--ink)}#tcd #tn{background:var(--pr);color:#fff}#tcd #tk{background:none;color:var(--mut)}
 </style></head><body><div id="app"></div><div id="rc"></div>
 <script src="config.js"></script><script src="data.js"></script>
 <script>
@@ -45,7 +51,7 @@ function rng(p){const t=new Date(),m=t.getMonth(),y=t.getFullYear();return{hari:
 function setP(p){FP=p;if(p!='kustom'){const r=rng(p);FF=iso(r[0]);FT=iso(r[1]);muat()}else render()}
 async function start(){if(!KEY){KEY=prompt('Kunci kasir')||'';KS=prompt('Nama kasir')||'';LS.k=KEY;LS.ks=KS}render();try{const d=await api('init');D=d;LS.c=JSON.stringify({produk:d.produk,terapis:d.terapis,cfg:d.cfg,admin:d.admin,kat:d.kat,lok:d.lok});render();hariIni();setTimeout(insLoad,2500);setTimeout(crmLoad,1500)}catch(e){if(/kunci/i.test(e.message)){LS.k='';KEY=''}$('app').insertAdjacentHTML('afterbegin','<div class="cd" style="color:var(--bad)">'+esc(e.message)+' (memakai data tersimpan)</div>')}}
 async function hariIni(){try{TD=(await api('riwayat',{dari:iso(new Date()),sampai:iso(new Date())})).filter(r=>r.status=='Lunas');if(tab=='pos')render()}catch(e){}}
-function render(){if(tab=='ana'&&!D.admin)tab='pos';$('app').innerHTML=`<div class="hd"><div class="hr"><b>🧾 Kasir Asiyah</b><span>${D.admin?'<button class="hb" onclick="insOpen()">🔔<i id="bd"></i></button>':''}<button class="hb" onclick="if(confirm('Ganti kunci kasir?')){LS.k='';location.reload()}">🔑</button></span></div><small>${esc(KS)||'kasir'} · ${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}</small></div><main id="mn"></main><nav>${[['pos','🛒','Kasir'],['his','📋','Riwayat'],['ana','📈','Analitik'],['kel','⚙️','Kelola']].filter(t=>t[0]!='ana'||D.admin).map(t=>`<button class="${tab==t[0]?'on':''}" onclick="go('${t[0]}')"><span>${t[1]}</span>${t[2]}</button>`).join('')}</nav>`;tab=='pos'?pos():tab=='kel'?kel():(FF||setP(FP),filt());bell()}
+function render(){if(tab=='ana'&&!D.admin)tab='pos';$('app').innerHTML=`<div class="hd"><div class="hr"><b>🧾 Kasir Asiyah</b><span>${D.admin?'<button class="hb" onclick="insOpen()">🔔<i id="bd"></i></button>':''}<button class="hb" onclick="tour()" title="Panduan">❓</button><button class="hb" onclick="if(confirm('Ganti kunci kasir?')){LS.k='';location.reload()}">🔑</button></span></div><small>${esc(KS)||'kasir'} · ${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}</small></div><main id="mn"></main><nav>${[['pos','🛒','Kasir'],['his','📋','Riwayat'],['ana','📈','Analitik'],['kel','⚙️','Kelola']].filter(t=>t[0]!='ana'||D.admin).map(t=>`<button class="${tab==t[0]?'on':''}" onclick="go('${t[0]}')"><span>${t[1]}</span>${t[2]}</button>`).join('')}</nav>`;tab=='pos'?pos():tab=='kel'?kel():(FF||setP(FP),filt());bell()}
 function go(t){tab=t;render()}
 // ---- INSIGHT BISNIS ----
 let INS=JSON.parse(LS.ins||'{"t":0,"l":[]}');const DAYN=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -169,6 +175,31 @@ function ana(){const a=agg(H),p=agg(PH),nd=Math.round((new Date(FT)-new Date(FF)
  <div class="cd"><h3>📣 Sumber klien</h3>${bars(a.s)}</div><div class="cd"><h3>⭐ Layanan terlaris (nilai)</h3>${bars(a.l)}</div><div class="cd"><h3>💳 Metode bayar</h3>${bars(a.m)}</div>
  <button class="bt" onclick="csv()">⬇️ Unduh CSV</button>`}
 function csv(){const l=['no,waktu,pelanggan,terapis,sumber,kategori,metode,total,tips,status'].concat(H.map(r=>[r.no,r.waktu,'"'+String(r.pelanggan).replace(/"/g,'')+'"',r.terapis,r.sumber,r.kategori,r.metode,r.total,r.tips,r.status].join(',')));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([l.join('\n')],{type:'text/csv'}));a.download=`kasir-${FF}_${FT}.csv`;a.click()}
+// ---- TOUR PEMAKAIAN ----
+const TOURV='1';
+function tour(i){
+  if(typeof i!=='number'){i=0;if(tab!='pos')go('pos')}
+  const old=$('tourL');old&&old.remove();
+  const nv=t=>[...document.querySelectorAll('nav button')].find(b=>b.textContent.includes(t)),
+  S=[{t:'Selamat datang 👋',x:'Panduan singkat memakai Kasir Asiyah, sekitar satu menit. Bisa dibuka lagi kapan saja lewat tombol ❓ di atas.'},
+   {e:()=>$('cs'),t:'1. Pilih kategori',x:'Ketuk untuk memilih kategori layanan, misalnya Newborn atau Laktasi.'},
+   {e:()=>$('sq'),t:'Cari layanan',x:'Atau ketik nama layanan di sini. Pencarian mencakup semua kategori.'},
+   {e:()=>document.querySelector('#li .it')||$('li'),t:'2. Pilih layanan',x:'Ketuk layanan untuk memasukkannya ke keranjang. Ketuk lagi untuk menambah jumlah.'},
+   {e:()=>document.querySelector('.fab'),t:'3. Keranjang dan bayar',x:'Setelah ada layanan terpilih, tombol keranjang muncul di bagian bawah. Ketuk untuk mengisi pelanggan, terapis, dan metode bayar, lalu Simpan. Struk bisa dicetak atau dikirim lewat WhatsApp.'},
+   {e:()=>nv('Riwayat'),t:'Riwayat',x:'Lihat transaksi, buka detailnya, dan cetak ulang struk'+(D.admin?'. Admin juga bisa membatalkan atau memulihkan transaksi.':'.')},
+   {e:()=>nv('Kelola'),t:'Kelola layanan',x:'Ubah nama dan harga layanan, tambah layanan baru, atau ubah nama kategori lewat tombol 🏷️ Kategori.'}];
+  if(D.admin)S.splice(6,0,{e:()=>nv('Analitik'),t:'Analitik',x:'Omzet, terapis, sumber klien, dan saran bisnis untuk pemilik.'});
+  S.push({t:'Selesai 🎉',x:'Selamat bekerja, Bunda! Kalau ada yang bingung, ketuk ❓ untuk mengulang panduan.'});
+  const L=document.createElement('div');L.id='tourL';L.innerHTML='<div id="tsp"></div><div id="tcd"></div>';document.body.appendChild(L);
+  let n=0;const end=()=>{LS.tour=TOURV;L.remove();removeEventListener('resize',rs)},rs=()=>step(n);
+  function step(k){n=k;const s=S[n],el=s.e&&s.e(),c=$('tcd'),sp=$('tsp');
+    if(el){el.scrollIntoView({block:'center'});const r=el.getBoundingClientRect();Object.assign(sp.style,{display:'block',left:r.left-6+'px',top:r.top-6+'px',width:r.width+12+'px',height:r.height+12+'px'});L.className='';
+      if(r.top>innerHeight/2){c.style.top='calc(16px + env(safe-area-inset-top))';c.style.bottom='auto'}else{c.style.bottom='calc(16px + env(safe-area-inset-bottom))';c.style.top='auto'}}
+    else{sp.style.display='none';L.className='dim';c.style.bottom='calc(16px + env(safe-area-inset-bottom))';c.style.top='auto'}
+    c.innerHTML=`<b>${s.t}</b><p>${s.x}${s.e&&!el?' <i>(Tombol ini muncul setelah Bunda memilih layanan.)</i>':''}</p><div class="td">${S.map((_,j)=>`<i class="${j==n?'on':''}"></i>`).join('')}</div><div class="tb"><button id="tk">Lewati</button><span>${n?'<button id="tp">Kembali</button>':''}<button id="tn">${n==S.length-1?'Selesai':'Lanjut'}</button></span></div>`;
+    $('tk').onclick=end;$('tn').onclick=()=>n==S.length-1?end():step(n+1);const p=$('tp');p&&(p.onclick=()=>step(n-1))}
+  addEventListener('resize',rs);setTimeout(()=>step(i),350)}
+setTimeout(()=>{if(KEY&&LS.tour!==TOURV&&!$('ov')&&!$('tourL'))tour()},2500);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});start();
 </script><script src="riwayat-plus.js"></script>
 </body></html>
